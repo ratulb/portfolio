@@ -21,15 +21,17 @@ spec:
   replicas: 1
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: https
+        prometheus.io/port: "9443"
       labels:
         app: portfolio
         solution: stock-trader
     spec:
       containers:
       - name: portfolio
-        image: portfolio:latest # Microservice Builder
-#       image: mycluster.icp:8500/stock-trader/portfolio:latest # IBM Cloud Private
-#       image: registry.ng.bluemix.net/stock_trader/portfolio:latest # IBM Container Service
+        image: mycluster.icp:8500/stock-trader/portfolio:latest
 #       image: ibmstocktrader/portfolio:latest # Docker Hub
         env:
           - name: JDBC_HOST
@@ -62,60 +64,71 @@ spec:
               secretKeyRef:
                 name: mq
                 key: id
+                optional: true
           - name: MQ_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: mq   
+                name: mq
                 key: pwd
+                optional: true
           - name: MQ_HOST
             valueFrom:
               secretKeyRef:
                 name: mq
                 key: host
+                optional: true
           - name: MQ_PORT
             valueFrom:
               secretKeyRef:
-                name: mq   
+                name: mq
                 key: port
+                optional: true
           - name: MQ_CHANNEL
             valueFrom:
               secretKeyRef:
-                name: mq   
+                name: mq
                 key: channel
+                optional: true
           - name: MQ_QUEUE_MANAGER
             valueFrom:
               secretKeyRef:
-                name: mq   
+                name: mq
                 key: queue-manager
+                optional: true
           - name: MQ_QUEUE
             valueFrom:
                secretKeyRef:
-                 name: mq   
+                 name: mq
                  key: queue
+                 optional: true
           - name: WATSON_URL
             valueFrom:
               secretKeyRef:
                 name: watson
                 key: url
+                optional: true
           - name: WATSON_ID
             valueFrom:
               secretKeyRef:
                 name: watson
                 key: id
+                optional: true
           - name: WATSON_PWD
             valueFrom:
               secretKeyRef:
                 name: watson
                 key: pwd
+                optional: true
           - name: ODM_URL
             valueFrom:
               secretKeyRef:
                 name: odm
                 key: url
+                optional: true
           - name: JWT_AUDIENCE
             valueFrom:
               secretKeyRef:
-                name: jwt 
+                name: jwt
                 key: audience
           - name: JWT_ISSUER
             valueFrom:
@@ -135,7 +148,7 @@ metadata:
   labels:
     app: portfolio
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
     - name: http
       protocol: TCP
@@ -147,8 +160,8 @@ spec:
       targetPort: 9443
   selector:
     app: portfolio
----   
-#Configure the ingress 
+---
+#Configure the ingress
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:

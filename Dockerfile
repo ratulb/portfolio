@@ -12,14 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# FROM openliberty/open-liberty:microProfile1
-FROM websphere-liberty:microProfile
+FROM openliberty/open-liberty:microProfile1
 
-COPY server.xml /config/server.xml
-COPY db2jcc4.jar /config/db2jcc4.jar
-COPY wmq.jmsra.rar /config/wmq.jmsra.rar
-COPY target/portfolio-1.0-SNAPSHOT.war /config/apps/Portfolio.war
-COPY key.jks /config/resources/security/key.jks
-COPY keystore.xml /config/configDropins/defaults/keystore.xml
-# COPY ltpa.keys /config/resources/security/ltpa.keys
-RUN installUtility install --acceptLicense defaultServer
+RUN groupadd -g 999 adminusr && \
+   useradd -r -u 999 -g adminusr adminusr
+RUN chown adminusr:adminusr -R /opt/ol /logs /config
+USER 999
+
+COPY --chown=adminusr db2jcc4.jar /config/db2jcc4.jar
+ADD --chown=adminusr \
+  http://repo1.maven.org/maven2/com/ibm/mq/wmq.jmsra/9.1.0.0/wmq.jmsra-9.1.0.0.rar \
+  /config/wmq.jmsra.rar
+COPY --chown=adminusr key.jks /config/resources/security/key.jks
+COPY --chown=adminusr keystore.xml /config/configDropins/defaults/keystore.xml
+COPY --chown=adminusr server.xml /config/server.xml
+COPY --chown=adminusr target/portfolio-1.0-SNAPSHOT.war /config/apps/Portfolio.war
