@@ -31,8 +31,8 @@ spec:
     spec:
       containers:
       - name: portfolio
-        image: mycluster.icp:8500/stock-trader/portfolio:latest
-#       image: ibmstocktrader/portfolio:latest # Docker Hub
+#        image: mycluster.icp:8500/stock-trader/portfolio:latest
+        image: ibmstocktrader/portfolio:latest # Docker Hub
         env:
           - name: JDBC_HOST
             valueFrom:
