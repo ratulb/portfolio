@@ -27,6 +27,7 @@ spec:
         prometheus.io/port: "9443"
       labels:
         app: portfolio
+        version: 1.0
         solution: stock-trader
     spec:
       containers:
