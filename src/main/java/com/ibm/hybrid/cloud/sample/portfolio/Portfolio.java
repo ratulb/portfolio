@@ -446,6 +446,11 @@ public class Portfolio extends Application {
 
 			//call the LoyaltyLevel business rule to get the current loyalty level of this portfolio
 			logger.info("Calling loyalty-level ODM business rule for "+owner);
+			if (odmService == null) {
+				logger.warning("Unable to get loyalty level - odm service is null, using cached value instead");
+				return oldLoyalty;
+			}
+
 			JsonObject loyaltyDecision = invokeREST(request, "POST", odmService, payloadString, null, null);
 			logger.info(loyaltyDecision.toString());
 			JsonObject loyaltyLevel = loyaltyDecision.getJsonObject("theLoyaltyDecision");
@@ -481,7 +486,7 @@ public class Portfolio extends Application {
 					logException(t);
 				}
 			}
-		} catch (IOException ioe) {
+		} catch (Exception ioe) {
 			logger.warning("Unable to get loyalty level.  Using cached value instead");
 			logException(ioe);
 			loyalty = oldLoyalty;
