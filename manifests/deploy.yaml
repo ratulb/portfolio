@@ -17,6 +17,10 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: portfolio
+  labels:
+    app: portfolio
+    solution: stock-trader
+    version: v1  
 spec:
   replicas: 1
   template:
