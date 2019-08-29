@@ -230,7 +230,7 @@ public class Portfolio extends Application {
 				try {
 					//call the StockQuote microservice to get the current price of this stock
 					logger.info("Calling stock-quote microservice for "+symbol);
-					JsonObject quote = invokeREST(request, "GET", QUOTE_SERVICE+"/"+symbol, null, null, null);
+					JsonObject quote = invokeREST(request, "GET", QUOTE_SERVICE+"/"+symbol, null, null, null, owner);
 
 					date = quote.getString("date");
 					price = quote.getJsonNumber("price").doubleValue();
@@ -390,7 +390,7 @@ public class Portfolio extends Application {
 		}
 
 		logger.info("Calling Watson Tone Analyzer");
-		JsonObject result = invokeREST(null, "POST", watsonService, input.toString(), watsonId, watsonPwd);
+		JsonObject result = invokeREST(null, "POST", watsonService, input.toString(), watsonId, watsonPwd, null);
 		if (result!=null) {
 			logger.info("Result from Watson Tone Analyzer: "+result.toString());
 			JsonObject document_tone = result.getJsonObject("document_tone");
@@ -451,7 +451,7 @@ public class Portfolio extends Application {
 				return oldLoyalty;
 			}
 
-			JsonObject loyaltyDecision = invokeREST(request, "POST", odmService, payloadString, null, null);
+			JsonObject loyaltyDecision = invokeREST(request, "POST", odmService, payloadString, null, null, null);
 			logger.info(loyaltyDecision.toString());
 			JsonObject loyaltyLevel = loyaltyDecision.getJsonObject("theLoyaltyDecision");
 			if (loyaltyLevel != null) {
@@ -494,13 +494,19 @@ public class Portfolio extends Application {
 		return loyalty;
 	}
 
-	private static JsonObject invokeREST(HttpServletRequest request, String verb, String uri, String payload, String user, String password) throws IOException {
+	private static JsonObject invokeREST(HttpServletRequest request, String verb, String uri, String payload, String user, String password, String owner) throws IOException {
 		logger.info("Preparing call to "+verb+" "+uri);
 		URL url = new URL(uri);
 
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-		if (request!=null) copyFromRequest(conn, request); //forward headers (including cookies) from inbound request
+		if (request!=null) {
+			//forward headers (including cookies) from inbound request
+			copyFromRequest(conn, request);
+
+			// add a portfolio_user header
+			addPortfolioUserHeader(conn, owner);
+		}
 
 		conn.setRequestMethod(verb);
 		conn.setRequestProperty("Content-Type", "application/json");
@@ -553,6 +559,12 @@ public class Portfolio extends Application {
 		} else {
 			logger.warning("headers is null");
 		}
+	}
+
+	//add portfolio_user here to specify rules for the user
+	private static void addPortfolioUserHeader(HttpURLConnection conn, String user) {
+		logger.info("Adding portfolio_user header for user " + user);
+		conn.setRequestProperty("portfolio_user", user);
 	}
 
 	private void initialize() throws NamingException {
