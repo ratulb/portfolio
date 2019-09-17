@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: stock-quote-service
+spec:
+  type: ExternalName
+  externalName: stock-quote-service.stock-quote.svc.cluster.local
+  ports:
+  - name: http
+    protocol: TCP
+    port: 9080
