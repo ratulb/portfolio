@@ -37,7 +37,7 @@ spec:
       containers:
       - name: portfolio
 #        image: mycluster.icp:8500/stock-trader/portfolio:latest
-        image: linsun/portfolio:latest
+        image: docker.io/linsun/portfolio:latest
         env:
           - name: JDBC_HOST
             valueFrom:
