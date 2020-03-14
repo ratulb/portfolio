@@ -19,7 +19,7 @@ RUN groupadd -g 999 adminusr && \
 RUN chown adminusr:adminusr -R /opt/ol /logs /config
 USER 999
 
-COPY --chown=adminusr db2jcc4.jar /config/db2jcc4.jar
+COPY --chown=adminusr mariadb-java-client-2.4.1.jar /config/mariadb-java-client-2.4.1.jar
 ADD --chown=adminusr \
   http://repo1.maven.org/maven2/com/ibm/mq/wmq.jmsra/9.1.0.0/wmq.jmsra-9.1.0.0.rar \
   /config/wmq.jmsra.rar
